@@ -4,13 +4,30 @@ services:
   kotlin:
     image: openjdk:17-jdk-slim
     ports:
-      - "8000:8080"
+      - "8000:8080" # Application port
+      - "5005:5005" # Debugging port
     depends_on:
       - mysql
     volumes:
       - ./../PlaygroundMath/build/libs/:/app
     working_dir: /app
-    command: ["java", "-jar", "/app/PlaygroundMath-0.0.1-SNAPSHOT.jar"]
+    command: [
+      "java",
+      "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+      "-jar",
+      "/app/PlaygroundMath-0.0.1-SNAPSHOT.jar"]
+
+  react:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./../PlaygroundMath-react:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: ["sh", "-c", "npm install && npm run dev"]
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
 
   mysql:
     image: mysql:latest
