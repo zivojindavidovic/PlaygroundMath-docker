@@ -4,8 +4,8 @@ services:
   kotlin:
     image: openjdk:17-jdk-slim
     ports:
-      - "8000:8080" # Application port
-      - "5005:5005" # Debugging port
+      - "8000:8080"
+      - "5005:5005"
     depends_on:
       - mysql
     volumes:
@@ -57,6 +57,16 @@ services:
       - portainer_data:/data
     ports:
       - "9000:9000"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./images/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - kotlin
+    restart: unless-stopped
 
 volumes:
   portainer_data:
